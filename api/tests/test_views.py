@@ -1,6 +1,7 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from django.urls import reverse
 import requests
+import json
 from ..views import *
 from rest_framework.test import APIClient
 import mock
@@ -416,7 +417,6 @@ class TestPostComment(APITestCase):
       serializer.save()
     # check if the Film objects got created
     self.assertEqual(Movie.objects.all().count(), 1)
-    print(Movie.objects.all())
     
     client = APIClient()
     response = client.post(reverse("comment-list"), {"author": "someone", "text": "something", "movie": 1},
@@ -527,7 +527,7 @@ class TestCommentList(APITestCase):
     film2 = Movie.objects.get(id=2)
     comment2 = Comment.objects.create(author='somebody', movie=film2, text='something')
     
-    response = self.client.get("/api/comment/?film=2")
+    response = self.client.get("/api/comment/?movie=2")
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
