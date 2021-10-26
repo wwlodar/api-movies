@@ -38,6 +38,6 @@ class Ratings(models.Model):
 
 
 class Comment(models.Model):
-  film = models.ForeignKey(Movie, on_delete=models.CASCADE)
+  movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
   text = models.CharField(max_length=1000)
   author = models.CharField(max_length=200)

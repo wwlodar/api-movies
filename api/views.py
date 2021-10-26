@@ -8,28 +8,30 @@ import json
 from rest_framework import generics
 from .models import Comment
 import io
-from rest_framework.renderers import JSONRenderer
 from .filters import MoviesFilter
 from .utils import get_data_from_api
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from .renderers import CustomBrowsableAPIRenderer
 
 
-@api_view(['GET'])
-def api_overview(request):
-  api_urls = {
-    'Detail view of movie': 'movie/',
-    'Get all comments': 'get/comments/',
-    'Add comment to movie ID': 'comment/post',
-  }
-  return Response(api_urls)
+class ApiOverviewSet(viewsets.ReadOnlyModelViewSet):
+  
+  def list(self, request):
+    api_urls = {
+      'Get or post a movie': 'movie/',
+      'Get or post a comment': 'comment/',
+    }
+    return Response(api_urls)
 
 
 class MovieViewSet(viewsets.GenericViewSet):
   queryset = Movie.objects.all()
   serializer_class = MovieSerializer
   filter_class = MoviesFilter
-
+  renderer_classes = (JSONRenderer, CustomBrowsableAPIRenderer, TemplateHTMLRenderer)
+  
   def list(self, request):
     assets = self.filter_queryset(self.get_queryset())
     serializer = MovieSerializer(assets, many=True)
@@ -88,46 +90,72 @@ class MovieViewSet(viewsets.GenericViewSet):
 #   filterset_class = MoviesFilter
 
 class CommentViewSet(viewsets.GenericViewSet):
-  pass
+  queryset = Comment.objects.all()
+  serializer_class = CommentSerializer
   
+  def list(self, request):
+    assets = self.filter_queryset(self.get_queryset())
+    serializer = CommentSerializer(assets, many=True)
+    return Response(serializer.data)
   
-@csrf_exempt
-@api_view(['POST'])
-def post_comment(request):
-  # taking data from request
-  try:
-    post_body = json.loads(request.body)
-    print(post_body)
-    things = ["author", "text", "film_id"]
-    if all(key in post_body for key in things):
-      print('film_id')
-      author = post_body.get('author')
-      text = post_body.get('text')
-      film_id = post_body.get('film_id')
+  def create(self, request):
+    required_fields = ["author", "text", "movie"]
+    print(request.data)
+    if all(key in request.data for key in required_fields):
+      author = request.data.get('author')
+      text = request.data.get('text')
+      movie_id = request.data.get('movie')
       
-      film = Movie.objects.filter(id=film_id)
-      
-      if film.exists():
-        film = Movie.objects.get(id=film_id)
-        comment = Comment.objects.create(film=film, text=text, author=author)
+      movie = Movie.objects.filter(id=movie_id)
+      if movie.exists():
+        movie = Movie.objects.get(id=movie_id)
+        comment = Comment.objects.create(movie=movie, text=text, author=author)
         serializer = CommentSerializer(comment)
         
-        # deserializing data
-        json1 = JSONRenderer().render(serializer.data)
-        stream = io.BytesIO(json1)
-        data = JSONParser().parse(stream)
-        serializer = CommentSerializer(data=data)
-        
-        if serializer.is_valid():
-          serializer.save()
-          return Response(serializer.data)
-        return Response(serializer.errors)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
       else:
-        return Response('Film with this id does not exist.')
+        return Response('Incorrect data, please add "author","text","film"')
     else:
-      return Response('Incorrect data, please add "author","text","film_id"')
-  except:
-    return Response("Incorrect format.")
+      return Response('Incorrect data, please add "author","text","film"')
+
+
+# @csrf_exempt
+# @api_view(['POST'])
+# def post_comment(request):
+#   # taking data from request
+#   try:
+#     post_body = json.loads(request.body)
+#     print(post_body)
+#     things = ["author", "text", "film_id"]
+#     if all(key in post_body for key in things):
+#       print('film_id')
+#       author = post_body.get('author')
+#       text = post_body.get('text')
+#       film_id = post_body.get('film_id')
+#
+#       film = Movie.objects.filter(id=film_id)
+#
+#       if film.exists():
+#         film = Movie.objects.get(id=film_id)
+#         comment = Comment.objects.create(film=film, text=text, author=author)
+#         serializer = CommentSerializer(comment)
+#
+#         # deserializing data
+#         json1 = JSONRenderer().render(serializer.data)
+#         stream = io.BytesIO(json1)
+#         data = JSONParser().parse(stream)
+#         serializer = CommentSerializer(data=data)
+#
+#         if serializer.is_valid():
+#           serializer.save()
+#           return Response(serializer.data)
+#         return Response(serializer.errors)
+#       else:
+#         return Response('Film with this id does not exist.')
+#     else:
+#       return Response('Incorrect data, please add "author","text","film_id"')
+#   except:
+#     return Response("Incorrect format.")
 
 
 class CommentList(generics.ListAPIView):

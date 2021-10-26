@@ -8,15 +8,13 @@ import mock
 
 class TestAPIOverview(APITestCase):
   def test_get(self):
-    response = self.client.get(reverse("api_overview"))
+    response = self.client.get(reverse("api_overview-list"))
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
     self.assertEqual({
-      'Detail view of movie': 'movies/post',
-      'Get all movies from database': 'movies/get',
-      'Get all comments': 'get/comments/',
-      'Add comment to movie ID': 'comment/post',
+      'Get or post a movie': 'movie/',
+      'Get or post a comment': 'comment/',
     }, response_data)
 
 
@@ -373,25 +371,25 @@ class TestMoviesPost(APITestCase):
 class TestPostComment(APITestCase):
   def test_incorrect_format(self):
     client = APIClient()
-    response = client.post(reverse("post_comment"), data={'something': 'something'})
+    response = client.post(reverse("comment-list"), data={'something': 'something'})
     
     self.assertEqual(200, response.status_code)
-    self.assertEqual(response.content, b'"Incorrect format."')
+    self.assertEqual(response.content, b'"Incorrect data, please add \\"author\\",\\"text\\",\\"film\\""')
   
   def test_missing_data(self):
     client = APIClient()
-    response = client.post(reverse("post_comment"), {"author": "someone", "text": "something"}, format='json')
+    response = client.post(reverse("comment-list"), {"author": "someone", "text": "something"}, format='json')
     
     self.assertEqual(200, response.status_code)
-    self.assertEqual(response.content, b'"Incorrect data, please add \\"author\\",\\"text\\",\\"film_id\\""')
+    self.assertEqual(response.content, b'"Incorrect data, please add \\"author\\",\\"text\\",\\"film\\""')
   
   def test_film_does_not_exist(self):
     client = APIClient()
-    response = client.post(reverse("post_comment"), {"author": "someone", "text": "something", "film_id": 1},
+    response = client.post(reverse("comment-list"), {"author": "someone", "text": "something", "movie": 1},
                            format='json')
     
     self.assertEqual(200, response.status_code)
-    self.assertEqual(response.content, b'"Film with this id does not exist."')
+    self.assertEqual(response.content, b'"Incorrect data, please add \\"author\\",\\"text\\",\\"film\\""')
   
   def test_film_exists(self):
     serializer = MovieSerializer(data=
@@ -421,23 +419,23 @@ class TestPostComment(APITestCase):
     print(Movie.objects.all())
     
     client = APIClient()
-    response = client.post(reverse("post_comment"), {"author": "someone", "text": "something", "film_id": 1},
+    response = client.post(reverse("comment-list"), {"author": "someone", "text": "something", "movie": 1},
                            format='json')
     response_data = json.loads(response.content)
-    self.assertEqual(200, response.status_code)
-    self.assertEqual(response.content, b'{"id":2,"text":"something","author":"someone","film":1}')
+    self.assertEqual(201, response.status_code)
+    self.assertEqual(response.content, b'{"id":1,"text":"something","author":"someone","movie":1}')
     self.assertEqual(response_data['text'], 'something')
     self.assertEqual(response_data['author'], 'someone')
-    self.assertEqual(response_data['film'], 1)
+    self.assertEqual(response_data['movie'], 1)
 
 
 class TestCommentList(APITestCase):
   def test_get_no_comments(self):
-    response = self.client.get(reverse("get_all_comments"))
+    response = self.client.get(reverse("comment-list"))
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual({'count': 0, 'next': None, 'previous': None, 'results': []}, response_data)
+    self.assertEqual([], response_data)
   
   def test_get_comments(self):
     
@@ -463,16 +461,15 @@ class TestCommentList(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
-    film = Movie.objects.get()
+    movie = Movie.objects.get()
     
-    comment = Comment.objects.create(author='somebody', film=film, text='something')
+    comment = Comment.objects.create(author='somebody', movie=movie, text='something')
     
-    response = self.client.get(reverse("get_all_comments"))
+    response = self.client.get(reverse("comment-list"))
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual(response_data['count'], 1)
-    self.assertEqual(response_data['results'], [{'id': 1, 'text': 'something', 'author': 'somebody', 'film': 1}])
+    self.assertEqual([response_data[0]], [{'id': 1, 'text': 'something', 'author': 'somebody', 'movie': 1}])
   
   def test_filtering(self):
     # add film 1
@@ -525,14 +522,13 @@ class TestCommentList(APITestCase):
     
     # create 2 comment for dif. films
     film1 = Movie.objects.get(id=1)
-    comment1 = Comment.objects.create(author='somebody', film=film1, text='something')
+    comment1 = Comment.objects.create(author='somebody', movie=film1, text='something')
     
     film2 = Movie.objects.get(id=2)
-    comment2 = Comment.objects.create(author='somebody', film=film2, text='something')
+    comment2 = Comment.objects.create(author='somebody', movie=film2, text='something')
     
-    response = self.client.get("/api/comment/get?film_id=2")
+    response = self.client.get("/api/comment/?film=2")
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual(response_data['count'], 1)
-    self.assertEqual(response_data['results'], [{'id': 2, 'text': 'something', 'author': 'somebody', 'film': 2}])
+    self.assertEqual([response_data[0]], [{'id': 2, 'text': 'something', 'author': 'somebody', 'movie': 2}])
