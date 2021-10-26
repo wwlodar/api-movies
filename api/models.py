@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Film(models.Model):
+class Movie(models.Model):
   Title = models.CharField(max_length=200, unique=True)
   Year = models.CharField(max_length=200)
   Rated = models.CharField(max_length=200)
@@ -29,12 +29,15 @@ class Film(models.Model):
 
 
 class Ratings(models.Model):
-  film = models.ForeignKey(Film, on_delete=models.CASCADE, related_name='Ratings', null=True, blank=True)
+  movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='Ratings', null=True, blank=True)
   Source = models.CharField(max_length=200)
   Value = models.CharField(max_length=200)
 
+  class Meta:
+    verbose_name_plural = "Ratings"
+
 
 class Comment(models.Model):
-  film = models.ForeignKey(Film, on_delete=models.CASCADE)
+  film = models.ForeignKey(Movie, on_delete=models.CASCADE)
   text = models.CharField(max_length=1000)
   author = models.CharField(max_length=200)
