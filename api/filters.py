@@ -15,17 +15,17 @@ class MoviesFilter(django_filters.FilterSet):
   def language_filter(self, queryset, name, value):
     query = Movie.objects.all()
     for language in value.split(","):
-      query = query.filter(Language__contains=language)
+      query = query.filter(Language__icontains=language)
     return query
   
   def genre_filter(self, queryset, name, value):
     query = Movie.objects.all()
     for genre in value.split(","):
-      query = query.filter(Genre__contains=genre)
+      query = query.filter(Genre__icontains=genre)
     return query
   
   def country_filter(self, queryset, name, value):
     query = Movie.objects.all()
     for country in value.split(","):
-      query = query.filter(Country__contains=country)
+      query = query.filter(Country__icontains=country)
     return query
