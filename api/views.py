@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
+from django_filters import rest_framework as filters
 
 
 class ApiOverviewSet(viewsets.ReadOnlyModelViewSet):
@@ -25,6 +26,7 @@ class MovieViewSet(viewsets.GenericViewSet):
   queryset = Movie.objects.all()
   serializer_class = MovieSerializer
   filter_class = MoviesFilter
+  filter_backends = (filters.DjangoFilterBackend,)
   renderer_classes = (JSONRenderer, CustomBrowsableAPIRenderer, TemplateHTMLRenderer)
   
   def list(self, request):

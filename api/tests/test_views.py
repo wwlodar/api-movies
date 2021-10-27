@@ -129,7 +129,7 @@ class TestGetMovies(APITestCase):
       serializer.save()
     
     # get response from the server
-    response = self.client.get('/api/movie/?language=english')
+    response = self.client.get('api/movie/?language=english')
     response_data = json.loads(response.content)
     # check if 2 films exist, but only 1 is displayed
     
@@ -192,7 +192,7 @@ class TestGetMovies(APITestCase):
       serializer.save()
     
     # get response from the server
-    response = self.client.get('/api/movie/?genre=crime')
+    response = self.client.get('api/movie/?genre=crime')
     response_data = json.loads(response.content)
     # check if 2 films exist, but only 1 is displayed
     self.assertEqual(200, response.status_code)
@@ -253,7 +253,7 @@ class TestGetMovies(APITestCase):
       serializer.save()
     
     # get response from the server
-    response = self.client.get('/api/movie/?country=united states')
+    response = self.client.get('api/movie/?country=united states')
     response_data = json.loads(response.content)
     # check if 2 films exist, but only 1 is displayed
     self.assertEqual(200, response.status_code)
@@ -469,7 +469,7 @@ class TestCommentList(APITestCase):
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual([response_data[0]], [{'id': 1, 'text': 'something', 'author': 'somebody', 'movie': movie.pk}])
+    self.assertEqual([response_data[0]], [{'id': comment.pk, 'text': 'something', 'author': 'somebody', 'movie': movie.pk}])
   
   def test_filtering(self):
     # add film 1
@@ -526,10 +526,10 @@ class TestCommentList(APITestCase):
     comment1 = Comment.objects.create(author='somebody', movie=film1, text='something')
     
     film2 = Movie.objects.get(id=id_second_movie)
-    comment2 = Comment.objects.create(author='somebody', movie=film2, text='something')
+    comment2 = Comment.objects.create(author='somebody2', movie=film2, text='something2')
     
-    response = self.client.get("/api/comments/?movie=2")
+    response = self.client.get("/api/comments/?movie=" + str(serializer.data['id']))
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual([response_data[0]], [{'id': 2, 'text': 'something', 'author': 'somebody', 'movie': id_second_movie}])
+    self.assertEqual([response_data[0]], [{'id': comment2.pk, 'text': 'something2', 'author': 'somebody2', 'movie': id_second_movie}])

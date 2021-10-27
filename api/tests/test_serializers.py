@@ -96,7 +96,12 @@ class TestMovieSerializer(TestCase):
     # This value should not be equal as ',' is removed during create().
     self.assertNotEqual(data['imdbVotes'], self.movie_attributes['imdbVotes'])
     self.assertEqual(data['imdbID'], self.movie_attributes['imdbID'])
-    self.assertEqual(data['Ratings'], self.movie_attributes['Ratings'])
+    
+    list = []
+    for item in data['Ratings']:
+      list.append(dict(item))
+    
+    self.assertEqual(list, self.movie_attributes['Ratings'])
 
 
 class TestCommentSerializer(TestCase):
