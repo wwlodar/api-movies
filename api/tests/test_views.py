@@ -426,7 +426,7 @@ class TestPostComment(APITestCase):
     comment = Comment.objects.first()
     response_data = json.loads(response.content)
     self.assertEqual(201, response.status_code)
-    self.assertEqual(response.content, b'{"id":comment.pk,"text":"something","author":"someone","movie":id_first_movie}')
+    self.assertEqual(str(response.content), {"id":comment.pk,"text":"something","author":"someone","movie":id_first_movie})
     self.assertEqual(response_data['text'], 'something')
     self.assertEqual(response_data['author'], 'someone')
     self.assertEqual(response_data['movie'], 1)
