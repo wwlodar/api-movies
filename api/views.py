@@ -1,14 +1,14 @@
-from rest_framework.response import Response
+from .renderers import CustomBrowsableAPIRenderer
 from .models import Movie
 from .serializers import MovieSerializer, CommentSerializer
-from rest_framework import generics
 from .models import Comment
 from .filters import MoviesFilter
 from .utils import get_data_from_api
+
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
-from .renderers import CustomBrowsableAPIRenderer
+from rest_framework.response import Response
 
 
 class ApiOverviewSet(viewsets.ReadOnlyModelViewSet):
@@ -16,7 +16,7 @@ class ApiOverviewSet(viewsets.ReadOnlyModelViewSet):
   def list(self, request):
     api_urls = {
       'Get or post a movie': 'movie/',
-      'Get or post a comment': 'comment/',
+      'Get or post a comment': 'comments/',
     }
     return Response(api_urls)
 
@@ -78,15 +78,3 @@ class CommentViewSet(viewsets.GenericViewSet):
         return Response('Incorrect data, please add "author","text","film"')
     else:
       return Response('Incorrect data, please add "author","text","film"')
-
-
-class CommentList(generics.ListAPIView):
-  serializer_class = CommentSerializer
-  
-  # filtering by film_id
-  def get_queryset(self):
-    queryset = Comment.objects.all()
-    film_id = self.request.query_params.get('movie')
-    if film_id is not None:
-      queryset = queryset.filter(film=Movie.objects.get(id=film_id))
-    return queryset

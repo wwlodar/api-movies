@@ -26,6 +26,9 @@ class Movie(models.Model):
   BoxOffice = models.CharField(max_length=200, null=True)
   Production = models.CharField(max_length=200, null=True)
   Website = models.CharField(max_length=200, null=True)
+  
+  def __str__(self):
+    return 'Id: {0}, Name: {1}'.format(str(self.pk), self.Title)
 
 
 class Ratings(models.Model):
