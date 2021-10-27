@@ -469,7 +469,7 @@ class TestCommentList(APITestCase):
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual([response_data[0]], [{'id': 1, 'text': 'something', 'author': 'somebody', 'movie': 1}])
+    self.assertEqual([response_data[0]], [{'id': 1, 'text': 'something', 'author': 'somebody', 'movie': movie.pk}])
   
   def test_filtering(self):
     # add film 1
@@ -495,6 +495,7 @@ class TestCommentList(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
+    id_first_movie = serializer.data['id']
     # add film 2
     serializer = MovieSerializer(data=
                                  {'Title': 'Gangs of New York 2', 'Year': '2002', 'Rated': 'R',
@@ -519,16 +520,16 @@ class TestCommentList(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
-    
+    id_second_movie = serializer.data['id']
     # create 2 comment for dif. films
-    film1 = Movie.objects.get(id=1)
+    film1 = Movie.objects.get(id=id_first_movie)
     comment1 = Comment.objects.create(author='somebody', movie=film1, text='something')
     
-    film2 = Movie.objects.get(id=2)
+    film2 = Movie.objects.get(id=id_second_movie)
     comment2 = Comment.objects.create(author='somebody', movie=film2, text='something')
     
     response = self.client.get("/api/comments/?movie=2")
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual([response_data[0]], [{'id': 2, 'text': 'something', 'author': 'somebody', 'movie': 2}])
+    self.assertEqual([response_data[0]], [{'id': 2, 'text': 'something', 'author': 'somebody', 'movie': id_second_movie}])
