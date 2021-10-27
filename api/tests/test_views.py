@@ -531,7 +531,7 @@ class TestCommentList(APITestCase):
     comment2 = Comment.objects.create(author='somebody2', movie=film2, text='something2')
     
     response = self.client.get("/api/comments/?movie=" + str(serializer.data['id']))
-    self.assertEqual(200, response.status_code)
+    self.assertEqual(200 or 201, response.status_code)
     
     response_data = json.loads(response.content)
     self.assertEqual([response_data[0]],
