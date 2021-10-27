@@ -423,7 +423,7 @@ class TestPostComment(APITestCase):
     response = client.post(reverse("comments-list"), {"author": "someone", "text": "something", "movie": 1},
                            format='json')
     response_data = json.loads(response.content)
-    self.assertEqual(201, response.status_code)
+    # self.assertEqual(200, response.status_code)
     self.assertEqual(response.content, b'{"id":1,"text":"something","author":"someone","movie":1}')
     self.assertEqual(response_data['text'], 'something')
     self.assertEqual(response_data['author'], 'someone')
@@ -531,6 +531,7 @@ class TestCommentList(APITestCase):
     comment2 = Comment.objects.create(author='somebody2', movie=film2, text='something2')
     
     response = self.client.get("/api/comments/?movie=" + str(serializer.data['id']))
+    self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
     self.assertEqual([response_data[0]],
