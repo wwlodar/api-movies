@@ -426,10 +426,11 @@ class TestPostComment(APITestCase):
     comment = Comment.objects.first()
     response_data = json.loads(response.content)
     self.assertEqual(201, response.status_code)
-    self.assertEqual(response_data, {"id":comment.pk,"text":"something","author":"someone","movie":id_first_movie})
+
     self.assertEqual(response_data['text'], 'something')
     self.assertEqual(response_data['author'], 'someone')
-    self.assertEqual(response_data['movie'], 1)
+    self.assertEqual(response_data['movie'], id_first_movie)
+    self.assertEqual(response_data['id'], comment.pk)
 
 
 class TestCommentList(APITestCase):
