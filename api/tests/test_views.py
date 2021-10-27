@@ -101,7 +101,7 @@ class TestGetMovies(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
-    
+    id_first_movie = serializer.data['id']
     film_serializer_data = json.dumps(serializer.data)
     film_serializer_data = json.loads(film_serializer_data)
     # add film 2
@@ -131,15 +131,16 @@ class TestGetMovies(APITestCase):
     # get response from the server
     response = self.client.get('/api/movie/?language=english')
     response_data = json.loads(response.content)
-    print(response.content)
+
     # check if 2 films exist, but only 1 is displayed
     
     self.assertEqual(200, response.status_code)
     self.assertEqual(Movie.objects.all().count(), 2)
+    self.assertEqual([film_serializer_data], response_data)
     
     response_data_dict = (response_data[0])
-    self.assertEqual(response_data_dict['id'], 1)
-    self.assertEqual([film_serializer_data], response_data)
+    self.assertEqual(response_data_dict['id'], str(id_first_movie))
+
   
   def test_filter_by_genre(self):
     # add film 1
@@ -165,7 +166,7 @@ class TestGetMovies(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
-    
+    id_first_movie = serializer.data['id']
     film_serializer_data = json.dumps(serializer.data)
     film_serializer_data = json.loads(film_serializer_data)
     # add film 2
@@ -191,7 +192,7 @@ class TestGetMovies(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
-    
+    id_second_movie = serializer.data['id']
     # get response from the server
     response = self.client.get('/api/movie/?genre=crime')
     response_data = json.loads(response.content)
@@ -200,8 +201,8 @@ class TestGetMovies(APITestCase):
     self.assertEqual(Movie.objects.all().count(), 2)
     self.assertEqual([film_serializer_data], response_data)
     
-    response_data_dict = (response_data)
-    self.assertEqual(response_data_dict['id'], 1)
+    response_data_dict = (response_data[0])
+    self.assertEqual(response_data_dict['id'], str(id_first_movie))
   
   def test_filter_by_country(self):
     # add film 1
@@ -226,7 +227,7 @@ class TestGetMovies(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
-    
+    id_first_movie = serializer.data['id']
     film_serializer_data = json.dumps(serializer.data)
     film_serializer_data = json.loads(film_serializer_data)
     # add film 2
@@ -262,7 +263,7 @@ class TestGetMovies(APITestCase):
     self.assertEqual([film_serializer_data], response_data)
     
     response_data_dict = (response_data[0])
-    self.assertEqual(response_data_dict['id'], 1)
+    self.assertEqual(response_data_dict['id'], str(id_first_movie))
 
 
 class TestMoviesPost(APITestCase):
