@@ -131,7 +131,7 @@ class TestGetMovies(APITestCase):
     # get response from the server
     response = self.client.get('/api/movie/?language=english')
     response_data = json.loads(response.content)
-
+    
     # check if 2 films exist, but only 1 is displayed
     
     self.assertEqual(200, response.status_code)
@@ -139,8 +139,7 @@ class TestGetMovies(APITestCase):
     self.assertEqual([film_serializer_data], response_data)
     
     response_data_dict = (response_data[0])
-    self.assertEqual(response_data_dict['id'], str(id_first_movie))
-
+    self.assertEqual(response_data_dict['id'], id_first_movie)
   
   def test_filter_by_genre(self):
     # add film 1
@@ -202,7 +201,7 @@ class TestGetMovies(APITestCase):
     self.assertEqual([film_serializer_data], response_data)
     
     response_data_dict = (response_data[0])
-    self.assertEqual(response_data_dict['id'], str(id_first_movie))
+    self.assertEqual(response_data_dict['id'], id_first_movie)
   
   def test_filter_by_country(self):
     # add film 1
@@ -263,7 +262,7 @@ class TestGetMovies(APITestCase):
     self.assertEqual([film_serializer_data], response_data)
     
     response_data_dict = (response_data[0])
-    self.assertEqual(response_data_dict['id'], str(id_first_movie))
+    self.assertEqual(response_data_dict['id'], id_first_movie)
 
 
 class TestMoviesPost(APITestCase):
@@ -471,7 +470,8 @@ class TestCommentList(APITestCase):
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual([response_data[0]], [{'id': comment.pk, 'text': 'something', 'author': 'somebody', 'movie': movie.pk}])
+    self.assertEqual([response_data[0]],
+                     [{'id': comment.pk, 'text': 'something', 'author': 'somebody', 'movie': movie.pk}])
   
   def test_filtering(self):
     # add film 1
@@ -534,4 +534,5 @@ class TestCommentList(APITestCase):
     self.assertEqual(200, response.status_code)
     
     response_data = json.loads(response.content)
-    self.assertEqual([response_data[0]], [{'id': comment2.pk, 'text': 'something2', 'author': 'somebody2', 'movie': id_second_movie}])
+    self.assertEqual([response_data[0]],
+                     [{'id': comment2.pk, 'text': 'something2', 'author': 'somebody2', 'movie': id_second_movie}])
