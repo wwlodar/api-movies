@@ -14,8 +14,8 @@ class TestAPIOverview(APITestCase):
     
     response_data = json.loads(response.content)
     self.assertEqual({
-      'Get or post a movie': 'movie/',
-      'Get or post a comment': 'comments/',
+      'Get or post a movie': 'api/movie/',
+      'Get or post a comment': 'api/comments/',
     }, response_data)
 
 

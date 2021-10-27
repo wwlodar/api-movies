@@ -15,8 +15,8 @@ class ApiOverviewSet(viewsets.ReadOnlyModelViewSet):
   
   def list(self, request):
     api_urls = {
-      'Get or post a movie': 'movie/',
-      'Get or post a comment': 'comments/',
+      'Get or post a movie': 'api/movie/',
+      'Get or post a comment': 'api/comments/',
     }
     return Response(api_urls)
 
