@@ -416,14 +416,15 @@ class TestPostComment(APITestCase):
                                  )
     if serializer.is_valid():
       serializer.save()
+    id_first_movie = serializer.data['id']
     # check if the Film objects got created
     self.assertEqual(Movie.objects.all().count(), 1)
     
     client = APIClient()
-    response = client.post(reverse("comments-list"), {"author": "someone", "text": "something", "movie": 1},
+    response = client.post(reverse("comments-list"), {"author": "someone", "text": "something", "movie": id_first_movie},
                            format='json')
     response_data = json.loads(response.content)
-    # self.assertEqual(200, response.status_code)
+    self.assertEqual(201, response.status_code)
     self.assertEqual(response.content, b'{"id":1,"text":"something","author":"someone","movie":1}')
     self.assertEqual(response_data['text'], 'something')
     self.assertEqual(response_data['author'], 'someone')
