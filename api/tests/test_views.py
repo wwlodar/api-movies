@@ -129,7 +129,7 @@ class TestGetMovies(APITestCase):
       serializer.save()
     
     # get response from the server
-    response = self.client.get('api/movie/?language=english')
+    response = self.client.get('/api/movie/?language=english')
     response_data = json.loads(response.content)
     # check if 2 films exist, but only 1 is displayed
     
@@ -192,7 +192,7 @@ class TestGetMovies(APITestCase):
       serializer.save()
     
     # get response from the server
-    response = self.client.get('api/movie/?genre=crime')
+    response = self.client.get('/api/movie/?genre=crime')
     response_data = json.loads(response.content)
     # check if 2 films exist, but only 1 is displayed
     self.assertEqual(200, response.status_code)
@@ -253,7 +253,7 @@ class TestGetMovies(APITestCase):
       serializer.save()
     
     # get response from the server
-    response = self.client.get('api/movie/?country=united states')
+    response = self.client.get('/api/movie/?country=united states')
     response_data = json.loads(response.content)
     # check if 2 films exist, but only 1 is displayed
     self.assertEqual(200, response.status_code)
