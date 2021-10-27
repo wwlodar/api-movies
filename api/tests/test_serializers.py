@@ -101,7 +101,7 @@ class TestMovieSerializer(TestCase):
     for item in data['Ratings']:
       list.append(dict(item))
     
-    self.assertEqual(list, self.movie_attributes['Ratings'])
+    self.assertCountEqual(list, self.movie_attributes['Ratings'])
 
 
 class TestCommentSerializer(TestCase):

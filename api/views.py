@@ -26,7 +26,6 @@ class MovieViewSet(viewsets.GenericViewSet):
   queryset = Movie.objects.all()
   serializer_class = MovieSerializer
   filter_class = MoviesFilter
-  filter_backends = (filters.DjangoFilterBackend,)
   renderer_classes = (JSONRenderer, CustomBrowsableAPIRenderer, TemplateHTMLRenderer)
   
   def list(self, request):
