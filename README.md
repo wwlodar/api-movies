@@ -1,9 +1,6 @@
 # api-movies [![wwlodar](https://circleci.com/gh/wwlodar/api-movies.svg?style=shield)](https://app.circleci.com/pipelines/github/wwlodar/api-movies?branch=main)
  API built with Django Rest Framework
 
-### Demo
-Here is a working live demo: https://pacific-refuge-57547.herokuapp.com/
-
 ### Technology
 Python 3.9.7. 
 djangorestframework 3.12.4
