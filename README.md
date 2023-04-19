@@ -1,4 +1,4 @@
-# api-movies [![wwlodar](https://circleci.com/gh/wwlodar/api-movies.svg?style=shield)](https://app.circleci.com/pipelines/github/wwlodar/api-movies?branch=main)
+# api-movies 
  API built with Django Rest Framework
 
 ### Technology
